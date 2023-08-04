@@ -1,6 +1,6 @@
-import Yup from "yup";
+import * as Yup from "yup";
 
-export const CreateEmployeeValidator = Yup.object({
+export const UpdateEmployeeValidator = Yup.object({
   email: Yup.string().email("Invalid email format").required("Email is required"),
   password: Yup.string().required("Password is required").matches(
     /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
@@ -13,4 +13,9 @@ export const CreateEmployeeValidator = Yup.object({
 export const LoginValidator = Yup.object({
   email: Yup.string().email("Invalid email format").required("Email is required"),
   password: Yup.string().required("Password is required")
+});
+
+export const CreateEmployeeValidator = Yup.object({
+  email: Yup.string().email("Invalid email format").required("Email is required"),
+  monthlySalary: Yup.number().required("Monthly Salary is required")
 })

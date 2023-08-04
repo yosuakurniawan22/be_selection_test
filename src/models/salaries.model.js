@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import db from "../database/index.js";
 import Users from "./users.model.js";
 
-const Sallaries = db.sequelize.define('sallaries', {
+const Salaries = db.sequelize.define('salaries', {
   userId: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -11,7 +11,7 @@ const Sallaries = db.sequelize.define('sallaries', {
       key: 'id'
     }
   },
-  sallary: {
+  salary: {
     type: DataTypes.DECIMAL(10,2),
     allowNull: false
   }
@@ -19,9 +19,9 @@ const Sallaries = db.sequelize.define('sallaries', {
   timestamps: false
 });
 
-Sallaries.belongsTo(Users, {
+Salaries.belongsTo(Users, {
   foreignKey: 'userId',
   as: 'user'
 });
 
-export default Sallaries;
+export default Salaries;

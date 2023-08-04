@@ -9,15 +9,19 @@ const Users = db.sequelize.define('users', {
   },
   password: {
     type: DataTypes.STRING,
+    allowNull: true,
   },
   fullName: {
     type: DataTypes.STRING,
+    allowNull: true,
   },
   birthdate: {
     type: DataTypes.DATE,
+    allowNull: true,
   },
   joindate: {
     type: DataTypes.DATE,
+    allowNull: true,
   },
   roleId: {
     type: DataTypes.INTEGER,
@@ -26,8 +30,6 @@ const Users = db.sequelize.define('users', {
       key: 'id'
     }
   }
-}, {
-  timestamps: false
 });
 
 Users.belongsTo(Roles, {
