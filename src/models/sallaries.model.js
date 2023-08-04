@@ -12,7 +12,7 @@ const Sallaries = db.sequelize.define('sallaries', {
     }
   },
   sallary: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.DECIMAL(10,2),
     allowNull: false
   }
 });
