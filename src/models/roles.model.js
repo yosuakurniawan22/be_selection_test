@@ -6,6 +6,8 @@ const Roles = db.sequelize.define('roles', {
     type: DataTypes.STRING,
     allowNull: false
   }
+}, {
+  timestamps: false
 });
 
 export default Roles;

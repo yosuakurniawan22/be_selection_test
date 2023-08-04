@@ -15,6 +15,8 @@ const Sallaries = db.sequelize.define('sallaries', {
     type: DataTypes.DECIMAL(10,2),
     allowNull: false
   }
+}, {
+  timestamps: false
 });
 
 Sallaries.belongsTo(Users, {

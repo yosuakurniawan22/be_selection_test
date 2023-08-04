@@ -26,6 +26,8 @@ const Users = db.sequelize.define('users', {
       key: 'id'
     }
   }
+}, {
+  timestamps: false
 });
 
 Users.belongsTo(Roles, {
