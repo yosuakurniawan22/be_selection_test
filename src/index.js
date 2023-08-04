@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import AuthRoutes from "./routes/auth.route.js";
 
 const app = express();
 
@@ -8,7 +9,9 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({ message: "Test Server"})
-})
+});
+
+app.use("/api", AuthRoutes);
 
 const PORT = process.env.PORT || 6000;
 
