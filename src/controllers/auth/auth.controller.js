@@ -1,5 +1,6 @@
 import db from "../../database/index.js";
 import sendEmail from "../../helper/sendEmail.js";
+import AttendanceLogs from "../../models/attendace_log.model.js";
 import Salaries from "../../models/salaries.model.js";
 import Users from "../../models/users.model.js";
 import { CreateEmployeeValidator, LoginValidator, UpdateAccountValidator } from "./validator.js";
@@ -138,6 +139,8 @@ const createEmployee = async (req, res) => {
 }
 
 const updateAccount = async (req, res) => {
+  const transaction = await db.sequelize.transaction();
+
   try {
     const { fullName, birthdate, password, confirmPassword } = req.body;
 
@@ -153,8 +156,8 @@ const updateAccount = async (req, res) => {
     const userId = req.id;
 
     const user = await Users.findOne({
-      where: { id: 6}
-    });
+      where: { id: userId },
+    }, { transaction: transaction });
 
     if (!user) {
       return res.status(404).json({
@@ -183,7 +186,15 @@ const updateAccount = async (req, res) => {
     user.joindate = formattedDate;
     user.updatedAt = currentDate;
 
-    await user.save();
+    await user.save({
+      transaction
+    });
+
+    const oneMonthLater = new Date(currentDate);
+    oneMonthLater.setMonth(currentDate.getMonth() + 1);
+    await generateAttendanceLogs(user, currentDate, oneMonthLater, transaction);
+
+    await transaction.commit();
 
     return res.status(200).json({
       status: 200,
@@ -192,11 +203,33 @@ const updateAccount = async (req, res) => {
 
   } catch (error) {
     console.error(error);
+    await transaction.rollback();
     return res.status(500).json({
       status: 500,
       message: "Error while processing your request"
     });
   }
-}
+};
+
+const generateAttendanceLogs = async (user, startDate, endDate, transaction) => {
+  try {
+    for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+      if (date.getDay() !== 0 && date.getDay() !== 6) {
+        const existingLog = await AttendanceLogs.findOne({
+          where: { userId: user.id, logDate: date },
+        }, { transaction: transaction});
+
+        if (!existingLog) {
+          await AttendanceLogs.create({
+            userId: user.id,
+            logDate: date.toISOString().split('T')[0],
+          }, { transaction: transaction });
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error generating attendance logs:', error);
+  }
+};
 
 export default { login, createEmployee, updateAccount }
