@@ -2,7 +2,7 @@ import db from "../../database/index.js";
 import sendEmail from "../../helper/sendEmail.js";
 import Salaries from "../../models/salaries.model.js";
 import Users from "../../models/users.model.js";
-import { CreateEmployeeValidator, LoginValidator } from "./validator.js";
+import { CreateEmployeeValidator, LoginValidator, UpdateAccountValidator } from "./validator.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -10,7 +10,14 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    await LoginValidator.validate(req.body);
+    try {
+      await LoginValidator.validate(req.body);
+    } catch (validationError) {
+      return res.status(400).json({
+        status: 400,
+        message: validationError.message
+      });
+    }
 
     const user = await Users.findOne({
       where: { email }
@@ -58,7 +65,14 @@ const createEmployee = async (req, res) => {
   try {
     const { email, monthlySalary, FE_URL } = req.body;
 
-    await CreateEmployeeValidator.validate(req.body);
+    try {
+      await CreateEmployeeValidator.validate(req.body);
+    } catch (validationError) {
+      return res.status(400).json({
+        status: 400,
+        message: validationError.message
+      });
+    }
 
     const userExist = await Users.findOne({
       where: { email }
@@ -123,4 +137,66 @@ const createEmployee = async (req, res) => {
   }
 }
 
-export default { login, createEmployee }
+const updateAccount = async (req, res) => {
+  try {
+    const { fullName, birthdate, password, confirmPassword } = req.body;
+
+    try {
+      await UpdateAccountValidator.validate(req.body);
+    } catch (validationError) {
+      return res.status(400).json({
+        status: 400,
+        message: validationError.message
+      });
+    }
+
+    const userId = req.id;
+
+    const user = await Users.findOne({
+      where: { id: 6}
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        message: "User Not Found"
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        status: 400,
+        message: "Passwords do not match"
+      });
+    }
+
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${currentDate.getDate().toString().padStart(2, '0')}`;
+
+    user.fullName = fullName;
+    user.birthdate = birthdate;
+    user.password = hashPassword;
+    user.joindate = formattedDate;
+    user.updatedAt = currentDate;
+
+    await user.save();
+
+    return res.status(200).json({
+      status: 200,
+      message: "Account updated successfully"
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Error while processing your request"
+    });
+  }
+}
+
+export default { login, createEmployee, updateAccount }

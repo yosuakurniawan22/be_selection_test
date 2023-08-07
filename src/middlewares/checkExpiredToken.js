@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import Users from "../models/users.model";
+import Users from "../models/users.model.js";
 
 export async function checkExpiredToken(req, res, next) {
   try {
@@ -21,7 +21,7 @@ export async function checkExpiredToken(req, res, next) {
       });
     }
 
-    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+    jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
       if (err) {
         return res.status(401).json({
           status: 401,
@@ -29,7 +29,7 @@ export async function checkExpiredToken(req, res, next) {
         });
       }
 
-      const user = Users.findOne({
+      const user = await Users.findOne({
         where: { id: decoded.id }
       });
 
@@ -47,6 +47,7 @@ export async function checkExpiredToken(req, res, next) {
         });
       }
       
+      req.id = decoded.id;
       next();
     });
   } catch (error) {
