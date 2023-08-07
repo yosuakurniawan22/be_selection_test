@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import AuthRoutes from "./routes/auth.route.js";
+import AttendanceRoutes from "./routes/attendance.route.js";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", AuthRoutes);
+app.use("/api", AttendanceRoutes);
 
 const PORT = process.env.PORT || 6000;
 
