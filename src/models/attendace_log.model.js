@@ -15,6 +15,18 @@ const AttendanceLogs = db.sequelize.define('attendance_logs', {
     type: DataTypes.DATEONLY,
     allowNull: false
   },
+  shift: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  scheduleIn: {
+    type: DataTypes.TIME,
+    allowNull: true,
+  },
+  scheduleOut: {
+    type: DataTypes.TIME,
+    allowNull: true,
+  },
   clockInTime: {
     type: DataTypes.DATE,
     allowNull: true,

@@ -214,22 +214,32 @@ const updateAccount = async (req, res) => {
 const generateAttendanceLogs = async (user, startDate, endDate, transaction) => {
   try {
     for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
-      if (date.getDay() !== 0 && date.getDay() !== 6) {
-        const existingLog = await AttendanceLogs.findOne({
-          where: { userId: user.id, logDate: date },
-        }, { transaction: transaction});
+      const isSunday = date.getDay() === 0;
+      const existingLog = await AttendanceLogs.findOne({
+        where: { userId: user.id, logDate: date },
+      }, { transaction });
 
-        if (!existingLog) {
-          await AttendanceLogs.create({
-            userId: user.id,
-            logDate: date.toISOString().split('T')[0],
-          }, { transaction: transaction });
+      if (!existingLog) {
+        const logData = {
+          userId: user.id,
+          logDate: date.toISOString().split('T')[0],
+        };
+
+        if (isSunday) {
+          logData.shift = 'holiday';
+          logData.scheduleIn = '00:00';
+          logData.scheduleOut = '00:00';
+        } else {
+          logData.shift = 'work';
+          logData.scheduleIn = '09:00';
+          logData.scheduleOut = '17:00';
         }
+
+        await AttendanceLogs.create(logData, { transaction });
       }
     }
   } catch (error) {
     console.error('Error generating attendance logs:', error);
   }
 };
-
 export default { login, createEmployee, updateAccount }
