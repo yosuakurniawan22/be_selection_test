@@ -43,6 +43,7 @@ const login = async (req, res) => {
     const token = jwt.sign({
       id: user.id,
       email: user.email,
+      userRole: user.roleId
     }, process.env.SECRET_KEY, { expiresIn: '2h'});
 
     return res.status(200).json({ 
@@ -108,7 +109,7 @@ const createEmployee = async (req, res) => {
       `<html>
         <body>
           <p>Please click this button to complete your account data</p>
-          <p><a href="${FE_URL}/${token}" target="_blank" style="display: inline-block; background-color: black; color: white; text-decoration: none; padding: 10px 20px; border-radius: 4px;">Complete Data</a></p>
+          <p><a href="${FE_URL}/updateEmployee/${token}" target="_blank" style="display: inline-block; background-color: black; color: white; text-decoration: none; padding: 10px 20px; border-radius: 4px;">Complete Data</a></p>
           <p>Thank you!</p>
         </body>
       </html>`
