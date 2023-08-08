@@ -144,7 +144,7 @@ const getAttendanceByDate = async (req, res) => {
     if(!attendance) {
       return res.status(404).json({
         status: 404,
-        message: 'Attendace Not Exists'
+        message: 'Attendance Not Exists'
       })
     }
 
