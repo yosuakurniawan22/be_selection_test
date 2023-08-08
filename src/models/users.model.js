@@ -29,7 +29,7 @@ const Users = db.sequelize.define('users', {
       model: Roles,
       key: 'id'
     }
-  }
+  },
 });
 
 Users.belongsTo(Roles, {

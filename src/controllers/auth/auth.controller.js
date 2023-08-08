@@ -100,7 +100,8 @@ const createEmployee = async (req, res) => {
     const token = jwt.sign({
       id: user.id,
       email: user.email,
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
+      joindate: user.joindate
     }, process.env.SECRET_KEY, { expiresIn: '3h'});
 
     const emailSent = await sendEmail(
@@ -243,4 +244,33 @@ const generateAttendanceLogs = async (user, startDate, endDate, transaction) => 
     console.error('Error generating attendance logs:', error);
   }
 };
-export default { login, createEmployee, updateAccount }
+
+const getLinkIsExpired = async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+
+    const user = await Users.findOne({ where: { id: decodedToken.id }});
+
+    if (user && user.joindate) {
+      return res.status(200).json({
+        status: 200,
+        result: true
+      });
+    } else {
+      return res.status(200).json({
+        status: 200,
+        result: false
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Error while processing your request"
+    });
+  }
+}
+
+export default { login, createEmployee, updateAccount, getLinkIsExpired }

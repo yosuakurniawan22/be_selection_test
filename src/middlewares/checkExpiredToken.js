@@ -40,7 +40,7 @@ export async function checkExpiredToken(req, res, next) {
         });
       }
 
-      if(user.updatedAt) {
+      if(user.joindate) {
         return res.status(401).json({
           status: 401,
           message: "Link Expired",
