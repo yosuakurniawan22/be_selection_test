@@ -3,6 +3,11 @@ import db from "../database/index.js";
 import Users from "./users.model.js";
 
 const AttendanceLogs = db.sequelize.define('attendance_logs', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   userId: {
     type: DataTypes.INTEGER,
     primaryKey: true,

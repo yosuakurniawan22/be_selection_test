@@ -3,6 +3,11 @@ import db from "../database/index.js";
 import Roles from "./roles.model.js";
 
 const Users = db.sequelize.define('users', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   email: {
     type: DataTypes.STRING,
     unique: true

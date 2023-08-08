@@ -5,9 +5,9 @@ const clockIn = async (req, res) => {
   try {
     const userId = req.id;
     const currentDate = new Date();
-
+    
     const logExists = await AttendanceLogs.findOne({
-      where: { id: userId, logDate: currentDate.toISOString().split('T')[0] }
+      where: { userId: userId, logDate: currentDate.toISOString().split('T')[0] }
     });
 
     if (!logExists) {
@@ -24,8 +24,10 @@ const clockIn = async (req, res) => {
       });
     }
 
-    logExists.clockInTime = currentDate;
-    await logExists.save();
+    await AttendanceLogs.update(
+      { clockInTime: currentDate },
+      { where: { id: logExists.id } }
+    );
     
     return res.status(200).json({
       status: 200,
@@ -44,27 +46,36 @@ const clockOut = async (req, res) => {
   try {
     const userId = req.id;
     const currentDate = new Date();
-
+  
     const logExists = await AttendanceLogs.findOne({
-      where: { userId, logDate: currentDate.toISOString().split('T')[0] },
+      where: { userId: userId, logDate: currentDate.toISOString().split('T')[0] }
     });
 
-    if (!logExists || logExists.clockOutTime) {
+    if (!logExists) {
+      return res.status(400).json({
+        status: 400,
+        message: "Attendance log not found for today"
+      });
+    }
+  
+    if (logExists.clockOutTime) {
       return res.status(400).json({
         status: 400,
         message: "Clock out not allowed"
       });
     }
-
+  
     if (!logExists.clockInTime) {
       return res.status(400).json({
         status: 400,
         message: "You must clock in before clocking out"
       });
     }
-
-    logExists.clockOutTime = currentDate;
-    await existingLog.save();
+  
+    await AttendanceLogs.update(
+      { clockOutTime: currentDate },
+      { where: { id: logExists.id } }
+    );
 
     return res.status(200).json({
       status: 200,
@@ -122,4 +133,33 @@ const getAttendanceHistory = async (req, res) => {
   }
 };
 
-export default { clockIn, clockOut, getAttendanceHistory }
+const getAttendanceByDate = async (req, res) => {
+  try {
+    const { date } = req.params;
+
+    const attendance = await AttendanceLogs.findOne({
+      where: { logDate: date }
+    });
+
+    if(!attendance) {
+      return res.status(404).json({
+        status: 404,
+        message: 'Attendace Not Exists'
+      })
+    }
+
+    return res.status(200).json({
+      status:200,
+      message: 'Attendance exists',
+      data: attendance
+    })
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Error while processing your request"
+    });
+  }
+}
+
+export default { clockIn, clockOut, getAttendanceHistory, getAttendanceByDate }
